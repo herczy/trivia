@@ -16,21 +16,21 @@ They have rolled a 1
 Chet's new location is 1
 The category is Science
 Science Question 0
-Answer was corrent!!!!
+Answer was correct!!!!
 Chet now has 1 Gold Coins.
 Pat is the current player
 They have rolled a 3
 Pat's new location is 3
 The category is Rock
 Rock Question 0
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 1 Gold Coins.
 Sue is the current player
 They have rolled a 5
 Sue's new location is 5
 The category is Science
 Science Question 1
-Answer was corrent!!!!
+Answer was correct!!!!
 Sue now has 1 Gold Coins.
 Chet is the current player
 They have rolled a 2
@@ -44,14 +44,14 @@ They have rolled a 4
 Pat's new location is 7
 The category is Rock
 Rock Question 2
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 2 Gold Coins.
 Sue is the current player
 They have rolled a 1
 Sue's new location is 6
 The category is Sports
 Sports Question 0
-Answer was corrent!!!!
+Answer was correct!!!!
 Sue now has 2 Gold Coins.
 Chet is the current player
 They have rolled a 3
@@ -66,7 +66,7 @@ They have rolled a 5
 Pat's new location is 0
 The category is Pop
 Pop Question 0
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 3 Gold Coins.
 Sue is the current player
 They have rolled a 2
@@ -83,7 +83,7 @@ They have rolled a 1
 Pat's new location is 1
 The category is Science
 Science Question 2
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 4 Gold Coins.
 Sue is the current player
 They have rolled a 3
@@ -187,14 +187,14 @@ They have rolled a 5
 Pat's new location is 5
 The category is Science
 Science Question 0
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 1 Gold Coins.
 Sue is the current player
 They have rolled a 3
 Sue's new location is 3
 The category is Rock
 Rock Question 0
-Answer was corrent!!!!
+Answer was correct!!!!
 Sue now has 1 Gold Coins.
 Chet is the current player
 They have rolled a 4
@@ -204,14 +204,14 @@ They have rolled a 3
 Pat's new location is 8
 The category is Pop
 Pop Question 0
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 2 Gold Coins.
 Sue is the current player
 They have rolled a 5
 Sue's new location is 8
 The category is Pop
 Pop Question 1
-Answer was corrent!!!!
+Answer was correct!!!!
 Sue now has 2 Gold Coins.
 Chet is the current player
 They have rolled a 2
@@ -223,14 +223,14 @@ They have rolled a 5
 Pat's new location is 1
 The category is Science
 Science Question 1
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 3 Gold Coins.
 Sue is the current player
 They have rolled a 3
 Sue's new location is 11
 The category is Rock
 Rock Question 1
-Answer was corrent!!!!
+Answer was correct!!!!
 Sue now has 3 Gold Coins.
 Chet is the current player
 They have rolled a 4
@@ -240,14 +240,14 @@ They have rolled a 3
 Pat's new location is 4
 The category is Pop
 Pop Question 2
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 4 Gold Coins.
 Sue is the current player
 They have rolled a 5
 Sue's new location is 4
 The category is Pop
 Pop Question 3
-Answer was corrent!!!!
+Answer was correct!!!!
 Sue now has 4 Gold Coins.
 Chet is the current player
 They have rolled a 2
@@ -259,14 +259,14 @@ They have rolled a 5
 Pat's new location is 9
 The category is Science
 Science Question 2
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 5 Gold Coins.
 Sue is the current player
 They have rolled a 3
 Sue's new location is 7
 The category is Rock
 Rock Question 2
-Answer was corrent!!!!
+Answer was correct!!!!
 Sue now has 5 Gold Coins.
 Chet is the current player
 They have rolled a 4
@@ -276,10 +276,12 @@ They have rolled a 3
 Pat's new location is 0
 The category is Pop
 Pop Question 4
-Answer was corrent!!!!
+Answer was correct!!!!
 Pat now has 6 Gold Coins.
 '''
 }
+
+import difflib
 
 
 class MockedRandomModule(object):
@@ -299,7 +301,7 @@ class TestTrivia(unittest.TestCase):
         res = sys.stdout = StringIO.StringIO()
         try:
             with self.__create_random_module_replacement(dataset):
-                execfile(os.path.join(os.path.dirname(__file__), 'trivia.py'), {'__name__': '__main__'}, {})
+                execfile(os.path.join(os.path.dirname(__file__), 'trivia.py'), {'__name__': '__main__'})
 
         finally:
             sys.stdout = oldout
@@ -318,6 +320,7 @@ class TestTrivia(unittest.TestCase):
 
     def test_run_with_sequential(self):
         data = self.__run_trivia_script(list(range(10)))
+        print('\n'.join(s.rstrip() for s in difflib.unified_diff(data.split('\n'), etalons['sequential'].split('\n'))))
         self.assertEqual(etalons['sequential'], data)
 
     def test_run_with_random(self):
