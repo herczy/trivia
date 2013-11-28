@@ -1,10 +1,5 @@
-'''
-Created on Nov 28, 2013
-
-@author: herczy
-'''
 import unittest
-from trivia import Game, Player, Question
+from trivia import Game, Player, Question, QuestionSet
 
 
 class TestPlayer(unittest.TestCase):
@@ -57,6 +52,28 @@ class TestQuestion(unittest.TestCase):
 
     def test_next_question(self):
         self.assertEqual(6, self.question.get_next_question().ident)
+
+
+class TestQuestionSet(unittest.TestCase):
+    def setUp(self):
+        self.questions = QuestionSet(('a', 'b'))
+        self.player = Player('x')
+
+    def test_initialize(self):
+        self.assertEqual(['a', 'b'], self.questions.categories)
+
+    def test_get_next_question(self):
+        self.assertEqual('a Question 0', self.questions.get_next_question(self.player).description)
+
+    def test_get_next_question_twice(self):
+        self.assertEqual('a Question 0', self.questions.get_next_question(self.player).description)
+        self.assertEqual('a Question 1', self.questions.get_next_question(self.player).description)
+
+    def test_get_category(self):
+        self.assertEqual('a', self.questions.get_category(self.player))
+
+        self.player.place += 3
+        self.assertEqual('b', self.questions.get_category(self.player))
 
 
 class TestGame(unittest.TestCase):

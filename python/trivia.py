@@ -42,16 +42,33 @@ class Question(object):
         return self.__class__(self.category, self.ident + 1)
 
 
-class Game(object):
-    __categories = ['Pop', 'Science', 'Sports', 'Rock']
+class QuestionSet(object):
+    def __init__(self, categories):
+        self.categories = list(categories)
+        self.questions = [Question(category, 0) for category in self.categories]
 
+    def get_next_question(self, player):
+        category_index = self.__get_category_index(player)
+        res = self.questions[category_index]
+        self.questions[category_index] = res.get_next_question()
+
+        return res
+
+    def get_category(self, player):
+        return self.categories[self.__get_category_index(player)]
+
+    def __get_category_index(self, player):
+        return player.place % len(self.categories)
+
+
+class Game(object):
     def __init__(self):
         self.players = []
 
         self.__current_player = 0
         self.is_getting_out_of_penalty_box = False
 
-        self.questions = [Question(category, 0) for category in self.__categories]
+        self.questions = QuestionSet(['Pop', 'Science', 'Sports', 'Rock'])
 
     def set_next_player(self):
         self.__current_player += 1
@@ -81,42 +98,33 @@ class Game(object):
     def __move_out_of_penalty_box(self, roll):
         self.is_getting_out_of_penalty_box = True
         self._report("%s is getting out of the penalty box" % self.current_player.name)
-        self.__ask_new_question(roll)
+        self.__ask_question(roll)
 
-    def __ask_new_question(self, roll):
+    def __ask_question(self, roll):
         self.current_player.move_to_new_place(roll)
-        self._report(self.current_player.name + '\'s new location is ' + str(self.current_player.place))
-        self._report("The category is %s" % self._current_category)
 
-        self._ask_question()
+        self._report(self.current_player.name + '\'s new location is ' + str(self.current_player.place))
+        self._report("The category is %s" % self.questions.get_category(self.current_player))
+        self._report(self.questions.get_next_question(self.current_player).description)
+
+
+    def __can_move_out_of_penalty_box(self, roll):
+        return roll % 2 != 0
 
     def roll(self, roll):
         self._report("%s is the current player" % self.current_player.name)
         self._report("They have rolled a %s" % roll)
 
         if self.current_player.in_penalty_box:
-            if roll % 2 != 0:
+            if self.__can_move_out_of_penalty_box(roll):
                 self.__move_out_of_penalty_box(roll)
 
             else:
                 self._report("%s is not getting out of the penalty box" % self.current_player.name)
                 self.is_getting_out_of_penalty_box = False
+
         else:
-            self.__ask_new_question(roll)
-
-    def _ask_question(self):
-        index = self.__categories.index(self._current_category)
-        res = self.questions[index]
-        self.questions[index] = res.get_next_question()
-        self._report(res.description)
-
-    @property
-    def _current_category(self):
-        if self.current_player.place > 10:
-            return 'Rock'
-
-        return self.__categories[self.current_player.place % 4]
-
+            self.__ask_question(roll)
 
     def __answer_was_correct(self):
         self._report("Answer was correct!!!!")
