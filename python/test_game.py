@@ -1,5 +1,9 @@
 import unittest
-from trivia import Game, Player, Question, QuestionSet
+from trivia import Game, Player, Question, QuestionSet, InternationalizedGame
+import gettext
+import mock
+import sys
+import StringIO
 
 
 class TestPlayer(unittest.TestCase):
@@ -77,8 +81,56 @@ class TestQuestionSet(unittest.TestCase):
 
 
 class TestGame(unittest.TestCase):
-    def test_add(self):
-        game = Game()
-        game.add('player1')
+    def setUp(self):
+        self.game = FakeGame()
+        self.game.add('player1')
 
-        self.assertEqual([Player('player1')], list(game.players))
+    def test_add(self):
+        self.assertEqual([Player('player1')], list(self.game.players))
+
+    def test_current_player(self):
+        self.assertEqual(Player('player1'), self.game.current_player)
+
+    def test_set_next_player_with_one_player(self):
+        self.game.set_next_player()
+
+        self.assertEqual(Player('player1'), self.game.current_player)
+
+    def test_set_next_player_with_two_player(self):
+        self.game.add('player2')
+        self.game.set_next_player()
+
+        self.assertEqual(Player('player2'), self.game.current_player)
+
+    def test_not_playable_with_one_player(self):
+        self.assertFalse(self.game.is_playable())
+
+    def test_playable_with_two_player(self):
+        self.game.add('player2')
+
+        self.assertTrue(self.game.is_playable())
+
+
+class FakeGame(Game):
+    def __init__(self):
+        self.messages = []
+        super(FakeGame, self).__init__()
+
+    def _report(self, msg, *args, **kwargs):
+        self.messages.append((msg, args, kwargs))
+
+
+class TestInternationalizedGame(unittest.TestCase):
+    @mock.patch('trivia.gettext')
+    def test_translated(self, gettext):
+        gettext.return_value = 'blabla'
+
+        oldout = sys.stdout
+        res = sys.stdout = StringIO.StringIO()
+        try:
+            InternationalizedGame()._report('albalb')
+
+        finally:
+            sys.stdout = oldout
+
+        self.assertEqual('blabla\n', res.getvalue())

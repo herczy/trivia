@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from gettext import gettext
+
 class Player(object):
     def __init__(self, name):
         self.name = name
@@ -85,10 +87,8 @@ class Game(object):
     def add(self, player_name):
         self.players.append(Player(player_name))
 
-        self._report(player_name + " was added")
-        self._report("They are player number %s" % len(self.players))
-
-        return True
+        self._report("{0} was added", player_name)
+        self._report("They are player number {0}", len(self.players))
 
     @property
     def how_many_players(self):
@@ -97,14 +97,14 @@ class Game(object):
 
     def __move_out_of_penalty_box(self, roll):
         self.is_getting_out_of_penalty_box = True
-        self._report("%s is getting out of the penalty box" % self.current_player.name)
+        self._report("{0} is getting out of the penalty box", self.current_player.name)
         self.__ask_question(roll)
 
     def __ask_question(self, roll):
         self.current_player.move_to_new_place(roll)
 
-        self._report(self.current_player.name + '\'s new location is ' + str(self.current_player.place))
-        self._report("The category is %s" % self.questions.get_category(self.current_player))
+        self._report('{0}\'s new location is {1}', self.current_player.name, str(self.current_player.place))
+        self._report("The category is {0}", self.questions.get_category(self.current_player))
         self._report(self.questions.get_next_question(self.current_player).description)
 
 
@@ -112,15 +112,15 @@ class Game(object):
         return roll % 2 != 0
 
     def roll(self, roll):
-        self._report("%s is the current player" % self.current_player.name)
-        self._report("They have rolled a %s" % roll)
+        self._report("{0} is the current player", self.current_player.name)
+        self._report("They have rolled a {0}", roll)
 
         if self.current_player.in_penalty_box:
             if self.__can_move_out_of_penalty_box(roll):
                 self.__move_out_of_penalty_box(roll)
 
             else:
-                self._report("%s is not getting out of the penalty box" % self.current_player.name)
+                self._report("{0} is not getting out of the penalty box", self.current_player.name)
                 self.is_getting_out_of_penalty_box = False
 
         else:
@@ -130,7 +130,7 @@ class Game(object):
         self._report("Answer was correct!!!!")
         self.current_player.pay()
 
-        self._report(self.current_player.name + ' now has ' + str(self.current_player.purse) + ' Gold Coins.')
+        self._report('{0} now has {1} Gold Coins.', self.current_player.name, self.current_player.purse)
         winner = self._did_player_win()
         self.set_next_player()
         return winner
@@ -147,7 +147,7 @@ class Game(object):
 
     def wrong_answer(self):
         self._report('Question was incorrectly answered')
-        self._report(self.current_player.name + " was sent to the penalty box")
+        self._report("{0} was sent to the penalty box", self.current_player.name)
         self.current_player.in_penalty_box = True
 
         self.set_next_player()
@@ -156,8 +156,13 @@ class Game(object):
     def _did_player_win(self):
         return not (self.current_player.purse == 6)
 
-    def _report(self, message):
-        print message
+    def _report(self, message, *args, **kwargs):
+        print message.format(*args, **kwargs)
+
+
+class InternationalizedGame(Game):
+    def _report(self, message, *args, **kwargs):
+        print gettext(message).format(*args, **kwargs)
 
 
 from random import randrange
