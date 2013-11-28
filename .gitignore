@@ -2,3 +2,7 @@ scala/.idea/
 scala/scala.iml
 scala/out/
 *.class
+*/.trivia
+htmlcov
+*.pyc
+.coverage
