@@ -1,3 +1,4 @@
+'''
 import unittest
 import sys
 import os.path
@@ -64,3 +65,4 @@ class TestTrivia(unittest.TestCase):
 
             print ('\n'.join(s.rstrip() for s in difflib.unified_diff(data.split('\n'), etalon.split('\n'))))
             raise
+'''

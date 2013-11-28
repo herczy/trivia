@@ -84,31 +84,49 @@ class TestGame(unittest.TestCase):
     def setUp(self):
         self.game = FakeGame()
         self.game.add('player1')
+        self.game.add('player2')
+
+        self.one_player_game = FakeGame()
+        self.one_player_game.add('player1')
 
     def test_add(self):
-        self.assertEqual([Player('player1')], list(self.game.players))
+        self.assertEqual([Player('player1'), Player('player2')], list(self.game.players))
 
     def test_current_player(self):
         self.assertEqual(Player('player1'), self.game.current_player)
 
     def test_set_next_player_with_one_player(self):
-        self.game.set_next_player()
+        self.one_player_game.set_next_player()
 
         self.assertEqual(Player('player1'), self.game.current_player)
 
     def test_set_next_player_with_two_player(self):
-        self.game.add('player2')
         self.game.set_next_player()
 
         self.assertEqual(Player('player2'), self.game.current_player)
 
     def test_not_playable_with_one_player(self):
-        self.assertFalse(self.game.is_playable())
+        self.assertFalse(self.one_player_game.is_playable())
 
     def test_playable_with_two_player(self):
-        self.game.add('player2')
-
         self.assertTrue(self.game.is_playable())
+
+    def test_wrong_answer(self):
+        self.game.wrong_answer()
+
+        self.assertEqual(Player('player2'), self.game.current_player)
+
+    def test_was_correct_for_the_first_question(self):
+        self.assertTrue(self.game.was_correctly_answered())
+        self.assertEqual(Player('player2'), self.game.current_player)
+        self.assertEqual(1, self.game.players[0].purse)
+
+    def test_was_correct_for_a_penaltied_player(self):
+        self.game.current_player.in_penalty_box = True
+
+        self.assertTrue(self.game.was_correctly_answered())
+        self.assertEqual(Player('player2'), self.game.current_player)
+        self.assertEqual(0, self.game.players[0].purse)
 
 
 class FakeGame(Game):

@@ -131,9 +131,9 @@ class Game(object):
         self.current_player.pay()
 
         self._report('{0} now has {1} Gold Coins.', self.current_player.name, self.current_player.purse)
-        winner = self._did_player_win()
+        non_winner = self.__did_not_player_win()
         self.set_next_player()
-        return winner
+        return non_winner
 
     def was_correctly_answered(self):
         if self.current_player.in_penalty_box:
@@ -148,12 +148,12 @@ class Game(object):
     def wrong_answer(self):
         self._report('Question was incorrectly answered')
         self._report("{0} was sent to the penalty box", self.current_player.name)
-        self.current_player.in_penalty_box = True
 
+        self.current_player.in_penalty_box = True
         self.set_next_player()
         return True
 
-    def _did_player_win(self):
+    def __did_not_player_win(self):
         return not (self.current_player.purse == 6)
 
     def _report(self, message, *args, **kwargs):
