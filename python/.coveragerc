@@ -1,0 +1,3 @@
+[run]
+omit = setup.py
+include = trivia.py
